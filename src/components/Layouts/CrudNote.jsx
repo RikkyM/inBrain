@@ -56,6 +56,7 @@ const CrudNote = () => {
 			"Data belum benar-benar tersimpan, aplikasi sedang dalam tahap pengembangan",
 		);
 		dispatch({ type: "TOGGLE_BOX" });
+		// test
 	};
 
 	return (
