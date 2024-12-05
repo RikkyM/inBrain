@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useCrudNoteDispatch } from "../hooks/useCrudNote";
 
 const iconPlus = (
@@ -16,7 +17,28 @@ const iconPlus = (
 const HomePage = () => {
 	const data = ["personal", "money", "private"];
 
+	const [modalCategory, setModalCategory] = useState(false);
+	const [sizeCategory, setSizeCategory] = useState(0);
+	const [categoryInput, setCategoryInput] = useState("");
+	const modalCatRef = useRef(null);
 	const dispatch = useCrudNoteDispatch();
+
+	const handleModalCategory = () => {
+		setModalCategory(!modalCategory);
+		setSizeCategory(!modalCategory ? modalCatRef.current.scrollHeight : 0);
+	};
+
+	const handleSubmitCategory = (e) => {
+		e.preventDefault();
+
+		if (categoryInput.trim() !== "") {
+			setModalCategory(!modalCategory);
+			setSizeCategory(!modalCategory ? modalCatRef.current.scrollHeight : 0);
+			setCategoryInput("");
+		} else {
+			alert("Kategori tidak boleh kosong");
+		}
+	};
 
 	return (
 		<div
@@ -24,37 +46,74 @@ const HomePage = () => {
 		>
 			<button
 				onClick={() => dispatch({ type: "TOGGLE_BOX" })}
-				className="fixed bottom-5 right-5 flex size-12 items-center rounded-full bg-green-200 p-2 text-green-600 shadow-sm"
+				className="group fixed bottom-5 right-5 flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
 			>
-				<div>{iconPlus}</div>
+				<div className="ml-3 whitespace-nowrap font-bold capitalize opacity-0 transition-all delay-0 duration-[.25s] md:group-hover:mr-1 md:group-hover:opacity-100 md:group-hover:delay-[.5s] md:group-hover:duration-[.5s]">
+					add note
+				</div>
+				<div className="absolute right-2 size-10 flex-shrink-0">{iconPlus}</div>
 			</button>
 			<div className="h-full w-full overflow-auto py-5 md:py-10">
 				<div>
 					<h2 className="px-4 text-3xl font-bold">General</h2>
-					<div className="no-scrollbar flex select-none items-center justify-start gap-2 overflow-auto p-4">
-						<div className="flex items-center justify-center">
-							<button className="relative size-10 rounded-full bg-blue-200 p-2 text-blue-600 shadow-sm">
-								{iconPlus}
-							</button>
+					<div className="no-scrollbar flex select-none flex-col items-start justify-center gap-2 overflow-auto p-4">
+						<div className="flex items-center gap-3">
+							<div className="flex items-center justify-center">
+								<button
+									onClick={handleModalCategory}
+									className="relative size-10 rounded-full bg-blue-200 p-2 text-blue-600 shadow-sm outline-none"
+								>
+									<span className="absolute left-1/2 top-1/2 h-0.5 w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600" />
+									<span
+										className={`absolute left-1/2 top-1/2 h-0.5 w-[15px] -translate-x-1/2 -translate-y-1/2 -rotate-90 transition-all duration-[.5s] ${modalCategory && "-rotate-0"} rounded-full bg-blue-600`}
+									/>
+								</button>
+							</div>
+							<div className="flex flex-1 gap-3">
+								{data &&
+									data.map((item, index) => (
+										<div key={index + 1}>
+											<input
+												type="checkbox"
+												id={`${item}`}
+												className="peer hidden"
+											/>
+											<label
+												htmlFor={`${item}`}
+												className="cursor-pointer rounded-full bg-blue-200 px-4 py-3 text-sm font-semibold capitalize text-blue-600 shadow-sm peer-checked:bg-blue-600 peer-checked:text-blue-100 md:py-2.5 md:text-base"
+											>
+												{item}
+											</label>
+										</div>
+									))}
+							</div>
 						</div>
-						<div className="flex flex-1 gap-3">
-							{data &&
-								data.map((item, index) => (
-									<div key={index + 1}>
-										<input
-											type="checkbox"
-											id={`${item}`}
-											className="peer hidden"
-										/>
-										<label
-											htmlFor={`${item}`}
-											className="cursor-pointer rounded-full bg-blue-200 px-4 py-3 text-sm font-semibold capitalize text-blue-600 shadow-sm peer-checked:bg-blue-600 peer-checked:text-blue-100 md:py-2.5 md:text-base"
-										>
-											{item}
-										</label>
-									</div>
-								))}
-						</div>
+						<form
+							onSubmit={handleSubmitCategory}
+							ref={modalCatRef}
+							style={{ height: sizeCategory ? `${sizeCategory}px` : 0 }}
+							className={`w-full overflow-hidden transition-all duration-[.5s]`}
+						>
+							<div className="flex h-full w-full flex-col gap-2 p-3">
+								<label htmlFor="category" className="flex flex-col">
+									<input
+										type="text"
+										name="category"
+										id="category"
+										placeholder="Category Name..."
+										value={categoryInput}
+										onChange={(e) => setCategoryInput(e.target.value)}
+										className="rounded border border-black/20 bg-transparent px-3 py-2 text-sm outline-none"
+									/>
+								</label>
+								<button
+									type="submit"
+									className="w-full rounded bg-blue-200 p-3 text-sm font-semibold capitalize text-blue-600"
+								>
+									add category
+								</button>
+							</div>
+						</form>
 					</div>
 					<div className="px-4 text-xs text-gray-500">
 						Fitur kategori belum dapat digunakan karena aplikasi sedang dalam

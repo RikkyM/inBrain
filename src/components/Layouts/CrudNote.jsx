@@ -27,6 +27,7 @@ const CrudNote = () => {
 			setTitleInput("");
 			setbodyInput("");
 			setCategorySelect("");
+			setCharacterCount(0)
 		}
 	}, [modal, titleInput, bodyInput, categorySelect]);
 
@@ -56,7 +57,6 @@ const CrudNote = () => {
 			"Data belum benar-benar tersimpan, aplikasi sedang dalam tahap pengembangan",
 		);
 		dispatch({ type: "TOGGLE_BOX" });
-		// test
 	};
 
 	return (
@@ -64,7 +64,7 @@ const CrudNote = () => {
 			ref={modalRef}
 			className={`absolute right-0 top-0 h-screen w-0 ${modal && "w-screen md:w-[50vw]"} no-scrollbar z-20 overflow-auto whitespace-nowrap bg-white font-sfmono shadow-sm transition-all duration-[.5s]`}
 		>
-			<div className="h-auto min-h-full w-auto p-5 md:w-[50vw]">
+			<div className="h-auto min-h-full w-auto w-screen p-5 md:w-[50vw]">
 				<div className="flex h-10 items-center justify-between">
 					<button
 						onClick={() => dispatch({ type: "TOGGLE_BOX" })}
@@ -81,7 +81,7 @@ const CrudNote = () => {
 							/>
 						</svg>
 					</button>
-					{titleInput.trim() !== "" && categorySelect !== "" && (
+					{((titleInput.trim() !== "" || bodyInput.trim() !== "") && categorySelect !== "") && (
 						<button onClick={handleNotif} className="capitalize">
 							simpan
 						</button>
@@ -96,10 +96,11 @@ const CrudNote = () => {
 							type="text"
 							name="title"
 							id="title"
-							placeholder="Judul..."
+							placeholder="Title..."
 							value={titleInput}
 							onChange={(e) => setTitleInput(e.target.value)}
 							className="break-all rounded px-3 py-2 text-2xl outline-none"
+							autoComplete="false"
 						/>
 						<div className="flex w-max select-none items-center justify-between gap-4 px-3 pb-4 text-xs font-semibold text-gray-400">
 							<label htmlFor="category">
@@ -108,7 +109,7 @@ const CrudNote = () => {
 									id="category"
 									value={categorySelect || ""}
 									onChange={(e) => setCategorySelect(e.target.value)}
-									className="capitalize outline-none"
+									className="bg-transparent capitalize outline-none"
 								>
 									<option value="">pilih kategori</option>
 									{data.map((item, index) => (
@@ -132,7 +133,8 @@ const CrudNote = () => {
 							onInput={handleTextareaChange}
 							value={bodyInput}
 							onChange={(e) => setbodyInput(e.target.value)}
-							placeholder="mulai mengetik..."
+							placeholder="typing..."
+							autoComplete="false"
 							className="h-auto resize-none rounded px-4 py-2 outline-none placeholder:capitalize"
 						></textarea>
 					</label>
