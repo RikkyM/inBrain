@@ -22,7 +22,7 @@ const Sidebar = () => {
 			<div className="font-sfmono flex h-full w-screen flex-col justify-between px-3 pb-14 pt-24 md:w-full md:py-10">
 				<div className="flex h-full flex-col gap-10 px-4">
 					<h2 className="font-sfmono whitespace-nowrap text-5xl font-extrabold md:text-2xl">
-						inBrain.
+						inMemo.
 					</h2>
 					<div className="flex h-full flex-col gap-5">
 						<div className="flex justify-between">

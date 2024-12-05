@@ -6,7 +6,7 @@ const Navbar = () => {
 
 	return (
 		<nav className="left-20 flex h-24 w-full items-center bg-transparent px-5 md:hidden">
-			<h2 className="font-sfmono text-2xl font-semibold">inBrain.</h2>
+			<h2 className="font-sfmono text-2xl font-semibold">inMemo.</h2>
 			<button
 				className={`absolute right-8 top-8 z-10 block flex items-center outline-none after:absolute after:left-1/2 after:top-1/2 after:-z-10 after:size-10 after:-translate-x-1/2 after:-translate-y-1/2 after:transition-all after:duration-[.5s] ${isOpen ? "after:scale-[1.2]" : "after:scale-0"} after:rounded-full after:bg-black after:content-[''] md:hidden`}
 				onClick={() => dispatch({ type: "TOGGLE_SIDEBAR" })}
