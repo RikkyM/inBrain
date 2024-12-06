@@ -79,8 +79,8 @@ const HomePage = () => {
 						<form
 							onSubmit={handleSubmitCategory}
 							ref={modalCatRef}
-							style={{ height: sizeCategory ? `${sizeCategory}px` : 0 }}
-							className={`w-full overflow-hidden transition-all duration-[.5s]`}
+							style={{ height: sizeCategory ? `${sizeCategory + 12}px` : 0 }}
+							className="w-full overflow-hidden rounded-md transition-all duration-[.5s] md:max-w-[470px]"
 						>
 							<div className="flex h-full w-full flex-col gap-2 p-3">
 								<label htmlFor="category" className="flex flex-col">
@@ -104,8 +104,8 @@ const HomePage = () => {
 						</form>
 					</div>
 					<div className="px-4 text-xs text-gray-500">
-						Fitur menambahkan catatan belum dapat digunakan karena aplikasi sedang dalam
-						tahap pengembangan.
+						Fitur menambahkan catatan belum dapat digunakan karena aplikasi
+						sedang dalam tahap pengembangan.
 					</div>
 				</div>
 			</div>
