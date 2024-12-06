@@ -9,7 +9,8 @@ const CrudNote = () => {
 	const [titleInput, setTitleInput] = useState("");
 	const [bodyInput, setbodyInput] = useState("");
 	const [categorySelect, setCategorySelect] = useState("");
-	const data = ["personal", "money", "private"];
+	// const data = ["personal", "money", "private"];
+	const { data } = useCrudNote();
 
 	const handleTextareaChange = (e) => {
 		e.target.style.height = "auto";
@@ -81,11 +82,12 @@ const CrudNote = () => {
 							/>
 						</svg>
 					</button>
-					{((titleInput.trim() !== "" || bodyInput.trim() !== "") && categorySelect !== "") && (
-						<button onClick={handleNotif} className="capitalize">
-							simpan
-						</button>
-					)}
+					{(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
+						categorySelect !== "" && (
+							<button onClick={handleNotif} className="capitalize">
+								simpan
+							</button>
+						)}
 				</div>
 				<div className="h-auto w-full">
 					<label
@@ -112,7 +114,7 @@ const CrudNote = () => {
 									className="bg-transparent capitalize outline-none"
 								>
 									<option value="">pilih kategori</option>
-									{data.map((item, index) => (
+									{Object.keys(data).map((item, index) => (
 										<option key={index} value={item}>
 											{item}
 										</option>

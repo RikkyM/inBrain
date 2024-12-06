@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { useCrudNoteDispatch } from "../hooks/useCrudNote";
+import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
+import { useCategories } from "../hooks/useCategories";
 
 const iconPlus = (
 	<svg
@@ -15,30 +15,18 @@ const iconPlus = (
 );
 
 const HomePage = () => {
-	const data = ["personal", "money", "private"];
-
-	const [modalCategory, setModalCategory] = useState(false);
-	const [sizeCategory, setSizeCategory] = useState(0);
-	const [categoryInput, setCategoryInput] = useState("");
-	const modalCatRef = useRef(null);
+	const { data } = useCrudNote();
 	const dispatch = useCrudNoteDispatch();
-
-	const handleModalCategory = () => {
-		setModalCategory(!modalCategory);
-		setSizeCategory(!modalCategory ? modalCatRef.current.scrollHeight : 0);
-	};
-
-	const handleSubmitCategory = (e) => {
-		e.preventDefault();
-
-		if (categoryInput.trim() !== "") {
-			setModalCategory(!modalCategory);
-			setSizeCategory(!modalCategory ? modalCatRef.current.scrollHeight : 0);
-			setCategoryInput("");
-		} else {
-			alert("Kategori tidak boleh kosong");
-		}
-	};
+	const {
+		categoryInput,
+		setCategoryInput,
+		sizeCategory,
+		notes,
+		modalCategory,
+		modalCatRef,
+		handleModalCategory,
+		handleSubmitCategory,
+	} = useCategories(data, dispatch);
 
 	return (
 		<div
@@ -55,7 +43,7 @@ const HomePage = () => {
 			</button>
 			<div className="h-full w-full overflow-auto py-5 md:py-10">
 				<div>
-					<h2 className="px-4 text-3xl font-bold">General</h2>
+					<h2 className="px-4 text-3xl font-bold">Home</h2>
 					<div className="no-scrollbar flex select-none flex-col items-start justify-center gap-2 overflow-auto p-4">
 						<div className="flex items-center gap-3">
 							<div className="flex items-center justify-center">
@@ -70,8 +58,8 @@ const HomePage = () => {
 								</button>
 							</div>
 							<div className="flex flex-1 gap-3">
-								{data &&
-									data.map((item, index) => (
+								{notes.length > 0 &&
+									notes.map((item, index) => (
 										<div key={index + 1}>
 											<input
 												type="checkbox"
@@ -116,7 +104,7 @@ const HomePage = () => {
 						</form>
 					</div>
 					<div className="px-4 text-xs text-gray-500">
-						Fitur kategori belum dapat digunakan karena aplikasi sedang dalam
+						Fitur menambahkan catatan belum dapat digunakan karena aplikasi sedang dalam
 						tahap pengembangan.
 					</div>
 				</div>

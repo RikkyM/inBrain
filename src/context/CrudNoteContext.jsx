@@ -15,9 +15,6 @@ const crudNoteReducer = (state, action) => {
 		case "ADD_NOTE": {
 			return { ...state, data: action.payload };
 		}
-		case "ADD_CATEGORY": {
-			return { ...state, data: action.payload };
-		}
 		default: {
 			throw Error("Unknown action: " + action.type);
 		}
