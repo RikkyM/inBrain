@@ -104,8 +104,22 @@ const HomePage = () => {
 						</form>
 					</div>
 					<div className="px-4 text-xs text-gray-500">
-						Fitur menambahkan catatan belum dapat digunakan karena aplikasi
-						sedang dalam tahap pengembangan.
+						{Object.entries(data).map(([category, notes]) => (
+							<div key={category} className="mb-4">
+								<h3 className="mb-2 text-sm font-bold">{category}</h3>
+								{notes && notes.length > 0 ? (
+									<ul className="list-disc pl-4">
+										{notes.map((note, noteIndex) => (
+											<li key={noteIndex} className="mb-1">
+												{note.title || note.body}
+											</li>
+										))}
+									</ul>
+								) : (
+									<p className="italic">No notes in this category</p>
+								)}
+							</div>
+						))}
 					</div>
 				</div>
 			</div>

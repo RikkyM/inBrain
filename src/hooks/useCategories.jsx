@@ -30,7 +30,7 @@ export const useCategories = (data, dispatch) => {
 
 			const updateNotes = {
 				...storeNotes,
-				[categoryInput]: {},
+				[categoryInput]: [],
 			};
 
 			dispatch({ type: "ADD_NOTE", payload: updateNotes });

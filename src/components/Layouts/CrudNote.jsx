@@ -9,7 +9,6 @@ const CrudNote = () => {
 	const [titleInput, setTitleInput] = useState("");
 	const [bodyInput, setbodyInput] = useState("");
 	const [categorySelect, setCategorySelect] = useState("");
-	// const data = ["personal", "money", "private"];
 	const { data } = useCrudNote();
 
 	const handleTextareaChange = (e) => {
@@ -28,7 +27,7 @@ const CrudNote = () => {
 			setTitleInput("");
 			setbodyInput("");
 			setCategorySelect("");
-			setCharacterCount(0)
+			setCharacterCount(0);
 		}
 	}, [modal, titleInput, bodyInput, categorySelect]);
 
@@ -50,14 +49,25 @@ const CrudNote = () => {
 		};
 	}, [modal, dispatch]);
 
-	const handleNotif = () => {
-		alert(
-			`Berhasil Disimpan\n\nDetail Catatan:\nJudul: ${titleInput}\nKategori: ${categorySelect}\nIsi: ${bodyInput}`,
-		);
-		alert(
-			"Data belum benar-benar tersimpan, aplikasi sedang dalam tahap pengembangan",
-		);
-		dispatch({ type: "TOGGLE_BOX" });
+	const handleSaveNotes = () => {
+		if (
+			(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
+			categorySelect !== ""
+		) {
+			const newNotes = {
+				...data,
+				[categorySelect]: [
+					...(data[categorySelect] || []),
+					{
+						id: (data[categorySelect] || []).length + 1,
+						title: titleInput.trim(),
+						body: bodyInput.trim(),
+					},
+				],
+			};
+			dispatch({ type: "ADD_NOTE", payload: newNotes });
+			console.log(newNotes)
+		}
 	};
 
 	return (
@@ -84,7 +94,7 @@ const CrudNote = () => {
 					</button>
 					{(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
 						categorySelect !== "" && (
-							<button onClick={handleNotif} className="capitalize">
+							<button onClick={handleSaveNotes} className="capitalize">
 								simpan
 							</button>
 						)}
