@@ -1,6 +1,9 @@
 import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import { useCategories } from "../hooks/useCategories";
 import { useToast, useToastDispatch } from "../hooks/useToast";
+import { useEffect, useRef, useState } from "react";
+
+import "../components/Elements/Toast/style.css";
 
 const iconPlus = (
 	<svg
@@ -30,20 +33,53 @@ const HomePage = () => {
 		handleSubmitCategory,
 	} = useCategories(data, dispatchCrudNote);
 
-	const handleAnimate = () => {
-		dispatchToast({ type: "TOAST" });
-		setTimeout(() => {
-			dispatchToast({ type: "TOAST" });
-		}, 4500);
+	const [open, setOpen] = useState(false);
+	const [isAnimating, setIsAnimating] = useState(false); // Untuk melacak animasi
+	const timerRef = useRef(null);
+	const [text, setText] = useState("");
+
+	const handleClick = () => {
+		// Reset animasi dengan cara memaksa re-render
+		setIsAnimating(false);
+		clearTimeout(timerRef.current);
+
+		timerRef.current = setTimeout(() => {
+			setIsAnimating(true); // Mulai animasi masuk
+			setOpen(true);
+			setText("berhasil");
+
+			// Timer untuk menutup toast
+			timerRef.current = setTimeout(() => {
+				setIsAnimating(false); // Mulai animasi keluar
+				setTimeout(() => {
+					setOpen(false);
+					setText("");
+				}, 300); // Hilangkan elemen setelah animasi keluar selesai
+			}, 2000);
+		}, 50);
 	};
+
+	useEffect(() => {
+		return () => {
+			clearTimeout(timerRef.current);
+		};
+	}, []);
 
 	return (
 		<div
 			className={`no-scrollbar h-[calc(100vh-6rem)] w-full overflow-auto font-sfmono transition-all duration-[.5s] md:h-screen`}
 		>
-			<button className="absolute right-0 top-0" onClick={handleAnimate}>
-				show toast
+			<button className="absolute right-0 top-0" onClick={handleClick}>
+				Show Toast
 			</button>
+			<div
+				className={`absolute rounded bg-gray-800 px-4 py-2 text-white shadow transition-all duration-300 ${
+					isAnimating ? "opacity-100" : "opacity-0"
+				}`}
+			>
+				{text}
+			</div>
+
 			<button
 				onClick={() => dispatchCrudNote({ type: "TOGGLE_BOX" })}
 				className="group fixed bottom-5 right-5 flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
