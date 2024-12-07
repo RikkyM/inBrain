@@ -66,7 +66,7 @@ const CrudNote = () => {
 				],
 			};
 			dispatch({ type: "ADD_NOTE", payload: newNotes });
-			console.log(newNotes)
+			dispatch({ type: "TOGGLE_BOX" });
 		}
 	};
 

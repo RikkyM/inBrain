@@ -5,12 +5,15 @@ import HomePage from "./pages/home";
 import Sidebar from "./components/Layouts/Sidebar";
 import Navbar from "./components/Layouts/Navbar";
 import CrudNote from "./components/Layouts/CrudNote";
+import Toast from "./components/Elements/Toast";
 
 function App() {
 	return (
 		<>
 			<section className="flex min-h-screen bg-[#F6F7FB]">
 				<Sidebar />
+				<CrudNote />
+				<Toast/>
 				<div className="relative h-screen w-full overflow-auto">
 					<Navbar />
 					<Routes>
@@ -19,7 +22,6 @@ function App() {
 						<Route path="/about" element={<AboutPage />}></Route> */}
 					</Routes>
 				</div>
-				<CrudNote />
 			</section>
 		</>
 	);

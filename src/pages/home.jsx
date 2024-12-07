@@ -1,5 +1,6 @@
 import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import { useCategories } from "../hooks/useCategories";
+import { useToast, useToastDispatch } from "../hooks/useToast";
 
 const iconPlus = (
 	<svg
@@ -16,7 +17,8 @@ const iconPlus = (
 
 const HomePage = () => {
 	const { data } = useCrudNote();
-	const dispatch = useCrudNoteDispatch();
+	const dispatchCrudNote = useCrudNoteDispatch();
+	const dispatchToast = useToastDispatch();
 	const {
 		categoryInput,
 		setCategoryInput,
@@ -26,14 +28,24 @@ const HomePage = () => {
 		modalCatRef,
 		handleModalCategory,
 		handleSubmitCategory,
-	} = useCategories(data, dispatch);
+	} = useCategories(data, dispatchCrudNote);
+
+	const handleAnimate = () => {
+		dispatchToast({ type: "TOAST" });
+		setTimeout(() => {
+			dispatchToast({ type: "TOAST" });
+		}, 4500);
+	};
 
 	return (
 		<div
 			className={`no-scrollbar h-[calc(100vh-6rem)] w-full overflow-auto font-sfmono transition-all duration-[.5s] md:h-screen`}
 		>
+			<button className="absolute right-0 top-0" onClick={handleAnimate}>
+				show toast
+			</button>
 			<button
-				onClick={() => dispatch({ type: "TOGGLE_BOX" })}
+				onClick={() => dispatchCrudNote({ type: "TOGGLE_BOX" })}
 				className="group fixed bottom-5 right-5 flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
 			>
 				<div className="ml-3 whitespace-nowrap font-bold capitalize opacity-0 transition-all delay-0 duration-[.25s] md:group-hover:mr-1 md:group-hover:opacity-100 md:group-hover:delay-[.5s] md:group-hover:duration-[.5s]">
