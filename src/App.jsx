@@ -10,7 +10,7 @@ import Toast from "./components/Elements/Toast";
 function App() {
 	return (
 		<>
-			<section className="flex min-h-screen bg-[#F6F7FB]">
+			<section className="flex min-h-screen bg-[#F6F7FB] relative">
 				<Sidebar />
 				<CrudNote />
 				<Toast/>

@@ -1,17 +1,22 @@
 import { useToast } from "../../../hooks/useToast";
-import "./style.css";
 
 const Toast = () => {
-	const { show } = useToast();
+	const { open, text, backgroundColor, isAnimating, isRemoving } = useToast();
+
+	if (!open) return null;
 
 	return (
-		<>
-			<div
-				className={`fixed right-5 transition-all duration-300 ${show ? "bottom-5 opacity-100" : "bottom-20 opacity-0"} rounded bg-green-500 px-4 py-2 text-white shadow-lg`}
-			>
-				Toast Tampil
-			</div>
-		</>
+		<div
+			className={`fixed bottom-5 left-5 right-5 z-50 mx-auto max-w-[400px] rounded px-6 py-4 text-sm text-white shadow transition-all duration-300 md:bottom-4 md:left-auto md:right-4 ${backgroundColor} ${
+				isAnimating
+					? "animate-slideIn"
+					: isRemoving
+						? "animate-slideOut"
+						: "opacity-0"
+			}`}
+		>
+			{text}
+		</div>
 	);
 };
 

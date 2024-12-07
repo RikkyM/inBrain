@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useCrudNote, useCrudNoteDispatch } from "../../hooks/useCrudNote";
+import { useToastDispatch } from "../../hooks/useToast";
 
 const CrudNote = () => {
 	const { modal } = useCrudNote();
 	const dispatch = useCrudNoteDispatch();
+	const showToast = useToastDispatch();
 	const [characterCount, setCharacterCount] = useState(0);
 	const modalRef = useRef(null);
 	const [titleInput, setTitleInput] = useState("");
@@ -67,6 +69,7 @@ const CrudNote = () => {
 			};
 			dispatch({ type: "ADD_NOTE", payload: newNotes });
 			dispatch({ type: "TOGGLE_BOX" });
+			showToast("Note added successfully.", "bg-green-500");
 		}
 	};
 

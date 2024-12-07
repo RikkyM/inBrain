@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export const useCategories = (data, dispatch) => {
+export const useCategories = (dispatch, showToast) => {
 	const [modalCategory, setModalCategory] = useState(false);
 	const [sizeCategory, setSizeCategory] = useState(0);
 	const [categoryInput, setCategoryInput] = useState("");
@@ -24,7 +24,7 @@ export const useCategories = (data, dispatch) => {
 			const storeNotes = JSON.parse(localStorage.getItem("notes")) || {};
 
 			if (storeNotes[categoryInput]) {
-				alert("Kategori sudah ada");
+				showToast("Category already exists.", "bg-red-500");
 				return;
 			}
 
@@ -40,8 +40,9 @@ export const useCategories = (data, dispatch) => {
 			setModalCategory(!modalCategory);
 			setSizeCategory(!modalCategory ? modalCatRef.current.scrollHeight : 0);
 			setCategoryInput("");
+			showToast("Successfully added new category.", "bg-green-500");
 		} else {
-			alert("Kategori tidak boleh kosong");
+			showToast("Category input cannot be empty.", "bg-red-500");
 		}
 	};
 	return {
