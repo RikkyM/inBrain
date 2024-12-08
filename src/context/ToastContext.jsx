@@ -21,14 +21,12 @@ const ToastProvider = ({ children }) => {
 	});
 	const timerRef = useRef(null);
 
-	const showToast = (text, type = 'default') => {
-		// Reset any existing timers
+	const showToast = (text, type = "default") => {
 		if (timerRef.current) {
 			clearTimeout(timerRef.current);
 		}
 
-		// Reset state
-		setToast({
+		const resetToast = () => ({
 			open: false,
 			text: "",
 			backgroundColor: TOAST_TYPES.default,
@@ -36,17 +34,17 @@ const ToastProvider = ({ children }) => {
 			isRemoving: false,
 		});
 
-		// Trigger toast sequence
+		setToast(resetToast());
+
 		timerRef.current = setTimeout(() => {
 			setToast({
 				open: true,
-				text: text,
+				text,
 				backgroundColor: TOAST_TYPES[type] || TOAST_TYPES.default,
 				isAnimating: true,
 				isRemoving: false,
 			});
 
-			// Hide toast after 2 seconds
 			timerRef.current = setTimeout(() => {
 				setToast((prev) => ({
 					...prev,
@@ -54,16 +52,7 @@ const ToastProvider = ({ children }) => {
 					isRemoving: true,
 				}));
 
-				// Remove toast completely
-				setTimeout(() => {
-					setToast({
-						open: false,
-						text: "",
-						backgroundColor: TOAST_TYPES.default,
-						isAnimating: false,
-						isRemoving: false,
-					});
-				}, 300);
+				setTimeout(() => setToast(resetToast()), 300);
 			}, 3500);
 		}, 50);
 	};
