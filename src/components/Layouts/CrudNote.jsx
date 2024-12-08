@@ -2,16 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { useCrudNote, useCrudNoteDispatch } from "../../hooks/useCrudNote";
 import { useToastDispatch } from "../../hooks/useToast";
 
-const CrudNote = () => {
+const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 	const { modal } = useCrudNote();
 	const dispatch = useCrudNoteDispatch();
 	const showToast = useToastDispatch();
 	const [characterCount, setCharacterCount] = useState(0);
 	const modalRef = useRef(null);
 	const [titleInput, setTitleInput] = useState("");
-	const [bodyInput, setbodyInput] = useState("");
+	const [bodyInput, setBodyInput] = useState("");
 	const [categorySelect, setCategorySelect] = useState("");
 	const { data } = useCrudNote();
+	const titleInputRef = useRef(null);
 
 	const formatDate = () => {
 		const date = new Date();
@@ -45,13 +46,29 @@ const CrudNote = () => {
 	};
 
 	useEffect(() => {
-		if (!modal) {
+		// Populate fields when editing an existing note
+		if (editingNote) {
+			setTitleInput(editingNote.title);
+			setBodyInput(editingNote.body);
+			setCategorySelect(editingNoteCategory);
+			setCharacterCount(editingNote.body.replace(/\s/g, "").length);
+		} else {
+			// Reset fields when creating a new note
 			setTitleInput("");
-			setbodyInput("");
+			setBodyInput("");
 			setCategorySelect("");
 			setCharacterCount(0);
 		}
-	}, [modal, titleInput, bodyInput, categorySelect]);
+	}, [editingNote, editingNoteCategory]);
+
+	useEffect(() => {
+		if (!modal) {
+			setTitleInput("");
+			setBodyInput("");
+			setCategorySelect("");
+			setCharacterCount(0);
+		}
+	}, [modal]);
 
 	useEffect(() => {
 		const handleClickOutside = (event) => {
@@ -71,33 +88,65 @@ const CrudNote = () => {
 		};
 	}, [modal, dispatch]);
 
+	useEffect(() => {
+		if (modal) {
+			titleInputRef.current.focus();
+		}
+	}, [modal]);
+
 	const handleSaveNotes = () => {
 		if (
 			(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
 			categorySelect !== ""
 		) {
-			const newNotes = {
-				...data,
-				[categorySelect]: [
-					...(data[categorySelect] || []),
+			if (editingNote) {
+				// Update existing note
+				const updatedNotes = { ...data };
+
+				// Remove note from original category
+				updatedNotes[editingNoteCategory] = updatedNotes[
+					editingNoteCategory
+				].filter((note) => note.id !== editingNote.id);
+
+				// Add updated note to new category
+				updatedNotes[categorySelect] = [
+					...(updatedNotes[categorySelect] || []),
 					{
-						id: (data[categorySelect] || []).length + 1,
+						...editingNote,
 						title: titleInput.trim(),
 						body: bodyInput.trim(),
-						timestamp: formatDate(), // Add timestamp to the note
+						timestamp: formatDate(),
 					},
-				],
-			};
-			dispatch({ type: "ADD_NOTE", payload: newNotes });
-			dispatch({ type: "TOGGLE_BOX" });
-			showToast("Note added successfully.", "success");
+				];
+
+				dispatch({ type: "UPDATE_NOTE", payload: updatedNotes });
+				dispatch({ type: "TOGGLE_BOX" });
+				showToast("Note updated successfully.", "success");
+			} else {
+				// Add new note (existing logic)
+				const newNotes = {
+					...data,
+					[categorySelect]: [
+						...(data[categorySelect] || []),
+						{
+							id: (data[categorySelect] || []).length + 1,
+							title: titleInput.trim(),
+							body: bodyInput.trim(),
+							timestamp: formatDate(),
+						},
+					],
+				};
+				dispatch({ type: "ADD_NOTE", payload: newNotes });
+				dispatch({ type: "TOGGLE_BOX" });
+				showToast("Note added successfully.", "success");
+			}
 		}
 	};
 
 	return (
 		<div
 			ref={modalRef}
-			className={`absolute right-0 top-0 h-screen w-0 ${modal && "w-screen md:w-[50vw]"} no-scrollbar z-20 overflow-auto whitespace-nowrap bg-white font-sfmono shadow-sm transition-all duration-[.5s]`}
+			className={`absolute right-0 top-0 h-screen w-0 ${modal && "w-screen md:w-[50vw]"} no-scrollbar z-40 overflow-auto whitespace-nowrap bg-white font-sfmono shadow-sm transition-all duration-[.5s]`}
 		>
 			<div className="h-auto min-h-full w-auto w-screen p-5 md:w-[50vw]">
 				<div className="flex h-10 items-center justify-between">
@@ -119,7 +168,7 @@ const CrudNote = () => {
 					{(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
 						categorySelect !== "" && (
 							<button onClick={handleSaveNotes} className="capitalize">
-								simpan
+								{editingNote ? "update" : "save"}
 							</button>
 						)}
 				</div>
@@ -137,6 +186,7 @@ const CrudNote = () => {
 							onChange={(e) => setTitleInput(e.target.value)}
 							className="break-all rounded px-3 py-2 text-2xl outline-none"
 							autoComplete="false"
+							ref={titleInputRef}
 						/>
 						<div className="flex w-max select-none items-center justify-between gap-4 px-3 pb-4 text-xs font-semibold text-gray-400">
 							<label htmlFor="category">
@@ -147,7 +197,7 @@ const CrudNote = () => {
 									onChange={(e) => setCategorySelect(e.target.value)}
 									className="bg-transparent capitalize outline-none"
 								>
-									<option value="">pilih kategori</option>
+									<option value="">select category</option>
 									{Object.keys(data).map((item, index) => (
 										<option key={index} value={item}>
 											{item}
@@ -156,7 +206,7 @@ const CrudNote = () => {
 								</select>
 							</label>
 							<span>|</span>
-							<p>{characterCount} karakter</p>
+							<p>{characterCount} character</p>
 						</div>
 					</label>
 					<label
@@ -168,7 +218,7 @@ const CrudNote = () => {
 							id="body"
 							onInput={handleTextareaChange}
 							value={bodyInput}
-							onChange={(e) => setbodyInput(e.target.value)}
+							onChange={(e) => setBodyInput(e.target.value)}
 							placeholder="typing..."
 							autoComplete="false"
 							className="h-auto resize-none rounded px-4 py-2 outline-none placeholder:capitalize"

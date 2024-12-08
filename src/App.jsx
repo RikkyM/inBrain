@@ -4,7 +4,6 @@ import HomePage from "./pages/home";
 // import AboutPage from "./pages/about";
 import Sidebar from "./components/Layouts/Sidebar";
 import Navbar from "./components/Layouts/Navbar";
-import CrudNote from "./components/Layouts/CrudNote";
 import Toast from "./components/Elements/Toast";
 
 function App() {
@@ -12,7 +11,6 @@ function App() {
 		<>
 			<section className="flex min-h-screen bg-[#F6F7FB] relative">
 				<Sidebar />
-				<CrudNote />
 				<Toast/>
 				<div className="relative h-screen w-full overflow-auto">
 					<Navbar />

@@ -16,7 +16,7 @@ const Sidebar = () => {
 
 	return (
 		<div
-			className={`absolute left-0 top-0 z-10 flex h-screen w-0 flex-col overflow-hidden bg-white transition-all duration-[.5s] md:relative md:w-80 ${
+			className={`absolute left-0 top-0 z-20 flex h-screen w-0 flex-col overflow-hidden bg-white transition-all duration-[.5s] md:relative md:w-80 ${
 				isOpen && "w-screen"
 			}`}
 		>

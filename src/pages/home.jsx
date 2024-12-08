@@ -1,7 +1,9 @@
 import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import { useCategories } from "../hooks/useCategories";
 import { useToastDispatch } from "../hooks/useToast";
+import Card from "../components/Elements/Card";
 import { useState } from "react";
+import CrudNote from "../components/Layouts/CrudNote";
 
 const iconPlus = (
 	<svg
@@ -20,6 +22,8 @@ const HomePage = () => {
 	const { data } = useCrudNote();
 	const dispatchCrudNote = useCrudNoteDispatch();
 	const showToast = useToastDispatch();
+	const [editingNote, setEditingNote] = useState(null);
+	const [editingNoteCategory, setEditingNoteCategory] = useState("");
 	const {
 		categoryInput,
 		setCategoryInput,
@@ -29,43 +33,28 @@ const HomePage = () => {
 		modalCatRef,
 		handleModalCategory,
 		handleSubmitCategory,
-	} = useCategories(dispatchCrudNote, showToast);
+		handleCategoryToggle,
+		allNotes,
+		selectedCategories,
+	} = useCategories(data, dispatchCrudNote, showToast);
 
-	const [selectedCategories, setSelectedCategories] = useState([]);
-
-	const handleCategoryToggle = (category) => {
-		setSelectedCategories((prev) =>
-			prev.includes(category)
-				? prev.filter((cat) => cat !== category)
-				: [...prev, category],
-		);
+	const handleEditNote = (note, category) => {
+		setEditingNote(note);
+		setEditingNoteCategory(category);
+		dispatchCrudNote({ type: "TOGGLE_BOX" });
 	};
-
-	const allNotes = Object.entries(data)
-		.flatMap(([category, categoryNotes]) =>
-			selectedCategories.length === 0 || selectedCategories.includes(category)
-				? categoryNotes.map((note) => ({
-						...note,
-						category,
-					}))
-				: [],
-		)
-		.sort((a, b) => {
-			// If timestamp exists, sort by it in descending order (most recent first)
-			if (a.timestamp && b.timestamp) {
-				return new Date(b.timestamp) - new Date(a.timestamp);
-			}
-			// If no timestamp, maintain original order or use fallback sorting
-			return 0;
-		});
 
 	return (
 		<div
 			className={`no-scrollbar h-[calc(100vh-6rem)] w-full overflow-auto font-sfmono transition-all duration-[.5s] md:h-screen`}
 		>
 			<button
-				onClick={() => dispatchCrudNote({ type: "TOGGLE_BOX" })}
-				className="group fixed bottom-5 right-5 z-10 flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
+				onClick={() => {
+					setEditingNote(null);
+					setEditingNoteCategory("");
+					dispatchCrudNote({ type: "TOGGLE_BOX" });
+				}}
+				className="group fixed bottom-5 right-5 z-[15] flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
 			>
 				<div className="ml-3 whitespace-nowrap font-bold capitalize opacity-0 transition-all delay-0 duration-[.25s] md:group-hover:mr-1 md:group-hover:opacity-100 md:group-hover:delay-[.5s] md:group-hover:duration-[.5s]">
 					add note
@@ -84,7 +73,7 @@ const HomePage = () => {
 								>
 									<span className="absolute left-1/2 top-1/2 h-0.5 w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600" />
 									<span
-										className={`absolute left-1/2 top-1/2 h-0.5 w-[15px] -translate-x-1/2 -translate-y-1/2 -rotate-90 transition-all duration-[.5s] ${modalCategory && "-rotate-0"} rounded-full bg-blue-600`}
+										className={`absolute left-1/2 top-1/2 h-0.5 w-[15px] -translate-x-1/2 -translate-y-1/2 transition-all duration-[.5s] ${modalCategory ? "-rotate-0" : "-rotate-90"} rounded-full bg-blue-600`}
 									/>
 								</button>
 							</div>
@@ -138,49 +127,20 @@ const HomePage = () => {
 					</div>
 					<div className="w-full p-4 text-gray-500">
 						<div className="columns-2 gap-4 space-y-4 lg:columns-3 xl:columns-4 2xl:columns-5">
-							{allNotes.map((note, index) => (
-								<div
-									key={index}
-									className="relative break-inside-avoid-column rounded-lg border border-gray-300 bg-white p-3 shadow-sm"
-								>
-									{/* Title with conditional styling and placeholder */}
-									<h4
-										className={`mb-2 text-lg font-semibold ${note.title ? "" : "select-none text-transparent"}`}
-									>
-										{note.title || "Untitled"}
-									</h4>
+							{allNotes.map((note, index) => {
+								// Find the category for this note
+								const category = Object.keys(data).find((cat) =>
+									data[cat].some((n) => n.id === note.id),
+								);
 
-									{/* Body with truncation */}
-									<div className="relative max-h-[500px] overflow-hidden">
-										<p className="line-clamp-[12] break-words text-xs leading-relaxed text-gray-600">
-											{note.body}
-										</p>
-										{note.body ? (
-											note.body.length > 500 && (
-												<div className="absolute bottom-0 left-0 h-10 w-full">
-													<span className="absolute bottom-0 right-0 bg-white text-xs">
-														...
-													</span>
-												</div>
-											)
-										) : (
-											<div className="text-xs">No text</div>
-										)}
-									</div>
-
-									{/* Category and Timestamp */}
-									<div className="mt-5 flex justify-between">
-										<p className="text-[.7rem] capitalize text-gray-400">
-											{note.category}
-										</p>
-										{note.timestamp && (
-											<p className="text-[.7rem] text-gray-400">
-												{note.timestamp}
-											</p>
-										)}
-									</div>
-								</div>
-							))}
+								return (
+									<Card
+										key={index}
+										note={note}
+										onClick={() => handleEditNote(note, category)}
+									/>
+								);
+							})}
 
 							{allNotes.length === 0 && (
 								<div className="px-1 text-gray-500">No notes found</div>
@@ -189,6 +149,10 @@ const HomePage = () => {
 					</div>
 				</div>
 			</div>
+			<CrudNote
+				editingNote={editingNote}
+				editingNoteCategory={editingNoteCategory}
+			/>
 		</div>
 	);
 };
