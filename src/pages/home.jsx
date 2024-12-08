@@ -132,21 +132,38 @@ const HomePage = () => {
 							{allNotes.map((note, index) => (
 								<div
 									key={index}
-									className="break-inside-avoid-column break-all rounded-lg border border-gray-300 bg-white p-3 shadow-sm"
+									className="relative break-inside-avoid-column rounded-lg border border-gray-300 bg-white p-3 shadow-sm"
 								>
+									{/* Title with conditional styling and placeholder */}
 									<h4
 										className={`mb-2 text-lg font-semibold ${note.title ? "" : "select-none text-transparent"}`}
 									>
-										{note.title || "asd"}
+										{note.title || "Untitled"}
 									</h4>
-									<p className="text-gray-600 text-xs">{note.body}</p>
-									<p className="text-gray-400 text-right mt-5 text-[.7rem] capitalize">{note.category}</p>
+
+									{/* Body with truncation */}
+									<div className="relative max-h-[500px] overflow-hidden">
+										<p className="line-clamp-[12] break-words text-xs leading-relaxed text-gray-600">
+											{note.body}
+										</p>
+										{note.body ? note.body.length > 500 && (
+											<div className="absolute bottom-0 left-0 h-10 w-full">
+												<span className="absolute bottom-0 right-0 bg-white text-xs">
+													...
+												</span>
+											</div>
+										) : <div className="text-xs">No text</div>}
+									</div>
+
+									{/* Category */}
+									<p className="mt-5 text-right text-[.7rem] capitalize text-gray-400">
+										{note.category}
+									</p>
 								</div>
 							))}
+
 							{allNotes.length === 0 && (
-								<div className="py-10 text-center text-gray-500">
-									No notes found
-								</div>
+								<div className="px-1 text-gray-500">No notes found</div>
 							)}
 						</div>
 					</div>
