@@ -13,6 +13,26 @@ const CrudNote = () => {
 	const [categorySelect, setCategorySelect] = useState("");
 	const { data } = useCrudNote();
 
+	const formatDate = () => {
+		const date = new Date();
+		return (
+			date.toLocaleDateString("en-CA", {
+				year: "numeric",
+				month: "numeric",
+				day: "numeric",
+			}) +
+			" " +
+			date
+				.toLocaleTimeString("id-ID", {
+					hour: "2-digit",
+					minute: "2-digit",
+					second: "2-digit",
+					hour12: false, // This ensures 24-hour format
+				})
+				.replace(/\./g, ":") // Replace dots with colons if needed
+		);
+	};
+
 	const handleTextareaChange = (e) => {
 		e.target.style.height = "auto";
 		e.target.style.height = `${e.target.scrollHeight}px`;
@@ -64,6 +84,7 @@ const CrudNote = () => {
 						id: (data[categorySelect] || []).length + 1,
 						title: titleInput.trim(),
 						body: bodyInput.trim(),
+						timestamp: formatDate(), // Add timestamp to the note
 					},
 				],
 			};

@@ -41,14 +41,23 @@ const HomePage = () => {
 		);
 	};
 
-	const allNotes = Object.entries(data).flatMap(([category, categoryNotes]) =>
-		selectedCategories.length === 0 || selectedCategories.includes(category)
-			? categoryNotes.map((note) => ({
-					...note,
-					category,
-				}))
-			: [],
-	);
+	const allNotes = Object.entries(data)
+		.flatMap(([category, categoryNotes]) =>
+			selectedCategories.length === 0 || selectedCategories.includes(category)
+				? categoryNotes.map((note) => ({
+						...note,
+						category,
+					}))
+				: [],
+		)
+		.sort((a, b) => {
+			// If timestamp exists, sort by it in descending order (most recent first)
+			if (a.timestamp && b.timestamp) {
+				return new Date(b.timestamp) - new Date(a.timestamp);
+			}
+			// If no timestamp, maintain original order or use fallback sorting
+			return 0;
+		});
 
 	return (
 		<div
@@ -56,7 +65,7 @@ const HomePage = () => {
 		>
 			<button
 				onClick={() => dispatchCrudNote({ type: "TOGGLE_BOX" })}
-				className="group fixed bottom-5 right-5 flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
+				className="group fixed bottom-5 right-5 z-10 flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
 			>
 				<div className="ml-3 whitespace-nowrap font-bold capitalize opacity-0 transition-all delay-0 duration-[.25s] md:group-hover:mr-1 md:group-hover:opacity-100 md:group-hover:delay-[.5s] md:group-hover:duration-[.5s]">
 					add note
@@ -146,19 +155,30 @@ const HomePage = () => {
 										<p className="line-clamp-[12] break-words text-xs leading-relaxed text-gray-600">
 											{note.body}
 										</p>
-										{note.body ? note.body.length > 500 && (
-											<div className="absolute bottom-0 left-0 h-10 w-full">
-												<span className="absolute bottom-0 right-0 bg-white text-xs">
-													...
-												</span>
-											</div>
-										) : <div className="text-xs">No text</div>}
+										{note.body ? (
+											note.body.length > 500 && (
+												<div className="absolute bottom-0 left-0 h-10 w-full">
+													<span className="absolute bottom-0 right-0 bg-white text-xs">
+														...
+													</span>
+												</div>
+											)
+										) : (
+											<div className="text-xs">No text</div>
+										)}
 									</div>
 
-									{/* Category */}
-									<p className="mt-5 text-right text-[.7rem] capitalize text-gray-400">
-										{note.category}
-									</p>
+									{/* Category and Timestamp */}
+									<div className="mt-5 flex justify-between">
+										<p className="text-[.7rem] capitalize text-gray-400">
+											{note.category}
+										</p>
+										{note.timestamp && (
+											<p className="text-[.7rem] text-gray-400">
+												{note.timestamp}
+											</p>
+										)}
+									</div>
 								</div>
 							))}
 
