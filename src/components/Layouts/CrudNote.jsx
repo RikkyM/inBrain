@@ -69,7 +69,7 @@ const CrudNote = () => {
 			};
 			dispatch({ type: "ADD_NOTE", payload: newNotes });
 			dispatch({ type: "TOGGLE_BOX" });
-			showToast("Note added successfully.", "bg-green-500");
+			showToast("Note added successfully.", "success");
 		}
 	};
 

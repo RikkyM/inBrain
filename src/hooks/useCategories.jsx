@@ -24,7 +24,7 @@ export const useCategories = (dispatch, showToast) => {
 			const storeNotes = JSON.parse(localStorage.getItem("notes")) || {};
 
 			if (storeNotes[categoryInput]) {
-				showToast("Category already exists.", "bg-red-500");
+				showToast("Category already exists.", "error");
 				return;
 			}
 
@@ -40,9 +40,9 @@ export const useCategories = (dispatch, showToast) => {
 			setModalCategory(!modalCategory);
 			setSizeCategory(!modalCategory ? modalCatRef.current.scrollHeight : 0);
 			setCategoryInput("");
-			showToast("Successfully added new category.", "bg-green-500");
+			showToast("Successfully added new category.", "success");
 		} else {
-			showToast("Category input cannot be empty.", "bg-red-500");
+			showToast("Category input cannot be empty.", "error");
 		}
 	};
 	return {

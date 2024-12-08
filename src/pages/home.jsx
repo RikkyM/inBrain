@@ -1,6 +1,7 @@
 import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import { useCategories } from "../hooks/useCategories";
 import { useToastDispatch } from "../hooks/useToast";
+import { useState } from "react";
 
 const iconPlus = (
 	<svg
@@ -29,6 +30,25 @@ const HomePage = () => {
 		handleModalCategory,
 		handleSubmitCategory,
 	} = useCategories(dispatchCrudNote, showToast);
+
+	const [selectedCategories, setSelectedCategories] = useState([]);
+
+	const handleCategoryToggle = (category) => {
+		setSelectedCategories((prev) =>
+			prev.includes(category)
+				? prev.filter((cat) => cat !== category)
+				: [...prev, category],
+		);
+	};
+
+	const allNotes = Object.entries(data).flatMap(([category, categoryNotes]) =>
+		selectedCategories.length === 0 || selectedCategories.includes(category)
+			? categoryNotes.map((note) => ({
+					...note,
+					category,
+				}))
+			: [],
+	);
 
 	return (
 		<div
@@ -67,10 +87,12 @@ const HomePage = () => {
 												type="checkbox"
 												id={`${item}`}
 												className="peer hidden"
+												checked={selectedCategories.includes(item)}
+												onChange={() => handleCategoryToggle(item)}
 											/>
 											<label
 												htmlFor={`${item}`}
-												className="cursor-pointer rounded-full bg-blue-200 px-4 py-3 text-sm font-semibold capitalize text-blue-600 shadow-sm peer-checked:bg-blue-600 peer-checked:text-blue-100 md:py-2.5 md:text-base"
+												className="h-full w-full cursor-pointer rounded-full bg-blue-200 px-4 py-3 text-sm font-semibold capitalize text-blue-600 shadow-sm peer-checked:bg-blue-600 peer-checked:text-blue-100 md:py-2.5 md:text-base"
 											>
 												{item}
 											</label>
@@ -105,23 +127,28 @@ const HomePage = () => {
 							</div>
 						</form>
 					</div>
-					<div className="px-4 text-xs text-gray-500">
-						{Object.entries(data).map(([category, notes]) => (
-							<div key={category} className="mb-4">
-								<h3 className="mb-2 text-sm font-bold">{category}</h3>
-								{notes && notes.length > 0 ? (
-									<ul className="list-disc pl-4">
-										{notes.map((note, noteIndex) => (
-											<li key={noteIndex} className="mb-1">
-												{note.title || note.body}
-											</li>
-										))}
-									</ul>
-								) : (
-									<p className="italic">No notes in this category</p>
-								)}
-							</div>
-						))}
+					<div className="w-full p-4 text-gray-500">
+						<div className="columns-2 gap-4 space-y-4 lg:columns-3 xl:columns-4 2xl:columns-5">
+							{allNotes.map((note, index) => (
+								<div
+									key={index}
+									className="break-inside-avoid-column break-all rounded-lg border border-gray-300 bg-white p-3 shadow-sm"
+								>
+									<h4
+										className={`mb-2 text-lg font-semibold ${note.title ? "" : "select-none text-transparent"}`}
+									>
+										{note.title || "asd"}
+									</h4>
+									<p className="text-gray-600 text-xs">{note.body}</p>
+									<p className="text-gray-400 text-right mt-5 text-[.7rem] capitalize">{note.category}</p>
+								</div>
+							))}
+							{allNotes.length === 0 && (
+								<div className="py-10 text-center text-gray-500">
+									No notes found
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

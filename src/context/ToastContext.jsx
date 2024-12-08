@@ -3,17 +3,25 @@ import { createContext, useState, useRef } from "react";
 const ToastContext = createContext(null);
 const ToastDispatchContext = createContext(null);
 
+const TOAST_TYPES = {
+	success: "bg-green-500",
+	error: "bg-red-500",
+	warning: "bg-yellow-500",
+	info: "bg-blue-500",
+	default: "bg-gray-800",
+};
+
 const ToastProvider = ({ children }) => {
 	const [toast, setToast] = useState({
 		open: false,
 		text: "",
-		backgroundColor: "bg-gray-800",
+		backgroundColor: TOAST_TYPES.default,
 		isAnimating: false,
 		isRemoving: false,
 	});
 	const timerRef = useRef(null);
 
-	const showToast = (text, backgroundColor = "bg-gray-800") => {
+	const showToast = (text, type = 'default') => {
 		// Reset any existing timers
 		if (timerRef.current) {
 			clearTimeout(timerRef.current);
@@ -23,7 +31,7 @@ const ToastProvider = ({ children }) => {
 		setToast({
 			open: false,
 			text: "",
-			backgroundColor: "bg-gray-800",
+			backgroundColor: TOAST_TYPES.default,
 			isAnimating: false,
 			isRemoving: false,
 		});
@@ -33,7 +41,7 @@ const ToastProvider = ({ children }) => {
 			setToast({
 				open: true,
 				text: text,
-				backgroundColor: backgroundColor,
+				backgroundColor: TOAST_TYPES[type] || TOAST_TYPES.default,
 				isAnimating: true,
 				isRemoving: false,
 			});
@@ -51,7 +59,7 @@ const ToastProvider = ({ children }) => {
 					setToast({
 						open: false,
 						text: "",
-						backgroundColor: "bg-gray-800",
+						backgroundColor: TOAST_TYPES.default,
 						isAnimating: false,
 						isRemoving: false,
 					});
