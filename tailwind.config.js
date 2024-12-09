@@ -9,6 +9,8 @@ export default {
 			animation: {
 				slideIn: "slideIn 0.3s forwards",
 				slideOut: "slideOut 0.3s forwards",
+				borderIn: "borderIn 0.3s forwards",
+				borderOut: "borderOut 0.3s forwards",
 			},
 			keyframes: {
 				slideIn: {
@@ -19,6 +21,14 @@ export default {
 					from: { opacity: 1, transform: "translateY(0)" },
 					to: { opacity: 0, transform: "translateX(1rem)" },
 				},
+				borderIn: {
+					from: { borderRadius: "20px" },
+					to: { borderRadius: "10px" }
+				},
+				borderOut: {
+					from: { borderRadius: "10px" },
+					to: { borderRadius: "20px" }
+				}
 			},
 		},
 	},

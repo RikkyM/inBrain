@@ -10,7 +10,6 @@ const Sidebar = () => {
 
 	const navLinks = [
 		{ path: "/", label: "Home" },
-		{ path: "/category", label: "Category" },
 		{ path: "/archive", label: "Archive" },
 	];
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export const useCategories = (data, dispatch, showToast) => {
+export const useCategories = (data, dispatch, showToast, search) => {
 	const [modalCategory, setModalCategory] = useState(false);
 	const [sizeCategory, setSizeCategory] = useState(0);
 	const [categoryInput, setCategoryInput] = useState("");
@@ -63,10 +63,16 @@ export const useCategories = (data, dispatch, showToast) => {
 	const allNotes = Object.entries(data)
 		.flatMap(([category, categoryNotes]) =>
 			selectedCategories.length === 0 || selectedCategories.includes(category)
-				? categoryNotes.map((note) => ({
-						...note,
-						category,
-					}))
+				? categoryNotes
+						.filter(
+							(note) =>
+								search === "" ||
+								note.title.toLowerCase().includes(search.toLowerCase()),
+						)
+						.map((note) => ({
+							...note,
+							category,
+						}))
 				: [],
 		)
 		.sort((a, b) => {

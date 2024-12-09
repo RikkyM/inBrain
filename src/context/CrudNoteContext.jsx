@@ -21,6 +21,14 @@ const crudNoteReducer = (state, action) => {
 				data: action.payload,
 			};
 		}
+		case "DELETE_NOTE": {
+			const data = { ...state.data };
+			delete data[action.payload];
+			return {
+				...state,
+				data: data
+			}
+		}
 		default: {
 			throw Error("Unknown action: " + action.type);
 		}

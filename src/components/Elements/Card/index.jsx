@@ -1,10 +1,10 @@
 const Card = ({ note, onClick = () => {} }) => {
     return (
 			<div onClick={onClick}
-				className="relative select-none cursor-pointer break-inside-avoid-column rounded-lg border border-gray-300 bg-white p-3 shadow-sm"
+				className="relative select-none cursor-pointer break-inside-avoid-column rounded-lg border border-black bg-white p-3 shadow-[5px_5px_0_0_rgba(0,0,0,1)]"
 			>
 				<h4
-					className={`mb-2 text-lg font-semibold ${note.title ? "" : "text-transparent"}`}
+					className={`mb-2 text-lg text-black font-semibold ${note.title ? "" : "text-transparent"}`}
 				>
 					{note.title || "-"}
 				</h4>

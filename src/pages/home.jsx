@@ -2,7 +2,7 @@ import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import { useCategories } from "../hooks/useCategories";
 import { useToastDispatch } from "../hooks/useToast";
 import Card from "../components/Elements/Card";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CrudNote from "../components/Layouts/CrudNote";
 
 const iconPlus = (
@@ -19,11 +19,15 @@ const iconPlus = (
 );
 
 const HomePage = () => {
-	const { data } = useCrudNote();
+	const { data, modal } = useCrudNote();
 	const dispatchCrudNote = useCrudNoteDispatch();
 	const showToast = useToastDispatch();
 	const [editingNote, setEditingNote] = useState(null);
 	const [editingNoteCategory, setEditingNoteCategory] = useState("");
+	const [search, setSearch] = useState("");
+	const [searchToggle, setSearchToggle] = useState(false);
+	const searchInputRef = useRef(null);
+	const searchRef = useRef(null);
 	const {
 		categoryInput,
 		setCategoryInput,
@@ -36,13 +40,42 @@ const HomePage = () => {
 		handleCategoryToggle,
 		allNotes,
 		selectedCategories,
-	} = useCategories(data, dispatchCrudNote, showToast);
+	} = useCategories(data, dispatchCrudNote, showToast, search);
 
 	const handleEditNote = (note, category) => {
 		setEditingNote(note);
 		setEditingNoteCategory(category);
 		dispatchCrudNote({ type: "TOGGLE_BOX" });
 	};
+
+	const handleToggleSearch = () => {
+		if (!searchToggle) {
+			setSearchToggle(true);
+			if (searchInputRef.current) {
+				searchInputRef.current.focus();
+			}
+		} else {
+			setSearchToggle(false);
+		}
+	};
+
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (
+				searchToggle &&
+				searchRef.current &&
+				!searchRef.current.contains(event.target)
+			) {
+				setSearchToggle(false)
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [searchToggle]);
 
 	return (
 		<div
@@ -54,22 +87,57 @@ const HomePage = () => {
 					setEditingNoteCategory("");
 					dispatchCrudNote({ type: "TOGGLE_BOX" });
 				}}
-				className="group fixed bottom-5 right-5 z-[15] flex h-14 w-14 items-center overflow-hidden rounded-full bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
+				className="group fixed bottom-5 right-5 z-[15] flex size-14 items-center overflow-hidden rounded-full border border-blue-500 bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
 			>
 				<div className="ml-3 whitespace-nowrap font-bold capitalize opacity-0 transition-all delay-0 duration-[.25s] md:group-hover:mr-1 md:group-hover:opacity-100 md:group-hover:delay-[.5s] md:group-hover:duration-[.5s]">
 					add note
 				</div>
 				<div className="absolute right-2 size-10 flex-shrink-0">{iconPlus}</div>
 			</button>
-			<div className="h-full w-full overflow-auto py-5 md:py-10">
-				<div>
-					<h2 className="px-4 text-3xl font-bold">Home</h2>
-					<div className="no-scrollbar flex select-none flex-col items-start justify-center gap-2 overflow-auto p-4">
+			<div
+				className={`h-full w-full overflow-auto py-5 md:py-10 ${modal ? "pointer-events-none" : "pointer-events-auto"}`}
+			>
+				<div className="flex h-full flex-col">
+					<div className="flex items-center justify-between px-4">
+						<h2 className="text-3xl font-bold">Home</h2>
+						<div
+							className={`flex h-10 w-full items-center justify-end gap-3 border border-black bg-white p-2 shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all duration-[.5s] ${searchToggle ? "animate-borderIn max-w-[230px] md:max-w-[300px]" : "animate-borderOut max-w-[40px] cursor-pointer"}`}
+							onClick={searchToggle ? () => {} : handleToggleSearch}
+							ref={searchRef}
+						>
+							<label htmlFor="search" className="w-full">
+								<input
+									type="text"
+									inputMode="search"
+									id="search"
+									ref={searchInputRef}
+									autoComplete="false"
+									value={search}
+									maxLength="30"
+									onChange={(e) => setSearch(e.target.value)}
+									className={`bg-transparent outline-none ${searchToggle ? "w-full" : "w-0"}`}
+								/>
+							</label>
+							<button onClick={handleToggleSearch} className="h-full">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-full"
+									viewBox="0 0 24 24"
+								>
+									<g fill="none" stroke="currentColor" strokeWidth="2">
+										<circle cx="11" cy="11" r="7" />
+										<path strokeLinecap="round" d="m20 20l-3-3" />
+									</g>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div className="no-scrollbar flex select-none flex-col items-start justify-start gap-2 overflow-auto p-4">
 						<div className="flex items-center gap-3">
-							<div className="flex items-center justify-center">
+							<div className="flex items-center justify-center gap-2">
 								<button
 									onClick={handleModalCategory}
-									className="relative size-10 rounded-full bg-blue-200 p-2 text-blue-600 shadow-sm outline-none"
+									className="relative size-10 rounded-full border border-blue-500 bg-blue-200 p-2 text-blue-600 shadow-sm outline-none"
 								>
 									<span className="absolute left-1/2 top-1/2 h-0.5 w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600" />
 									<span
@@ -90,7 +158,7 @@ const HomePage = () => {
 											/>
 											<label
 												htmlFor={`${item}`}
-												className="h-full w-full cursor-pointer rounded-full bg-blue-200 px-4 py-3 text-sm font-semibold capitalize text-blue-600 shadow-sm peer-checked:bg-blue-600 peer-checked:text-blue-100 md:py-2.5 md:text-base"
+												className="h-full w-full cursor-pointer rounded-full border border-blue-500 bg-blue-200 px-4 py-3 text-sm font-semibold capitalize text-blue-600 shadow-sm peer-checked:bg-blue-600 peer-checked:text-blue-100 md:py-2.5 md:text-base"
 											>
 												{item}
 											</label>
@@ -101,11 +169,11 @@ const HomePage = () => {
 						<form
 							onSubmit={handleSubmitCategory}
 							ref={modalCatRef}
-							style={{ height: sizeCategory ? `${sizeCategory + 12}px` : 0 }}
+							style={{ height: sizeCategory ? `${sizeCategory + 70}px` : 0 }}
 							className="w-full overflow-hidden rounded-md transition-all duration-[.5s] md:max-w-[470px]"
 						>
-							<div className="flex h-full w-full flex-col gap-2 p-3">
-								<label htmlFor="category" className="flex flex-col">
+							<div className="flex h-max w-full items-center justify-center gap-2 p-3">
+								<label htmlFor="category" className="flex w-full flex-col">
 									<input
 										type="text"
 										name="category"
@@ -113,39 +181,67 @@ const HomePage = () => {
 										placeholder="Category Name..."
 										value={categoryInput}
 										onChange={(e) => setCategoryInput(e.target.value)}
-										className="rounded border border-black/20 bg-transparent px-3 py-2 text-sm outline-none"
+										className="rounded border border-black bg-transparent px-3 py-2 text-sm outline-none"
 									/>
 								</label>
 								<button
 									type="submit"
-									className="w-full rounded bg-blue-200 p-3 text-sm font-semibold capitalize text-blue-600"
+									className="flex items-center justify-center whitespace-nowrap rounded border border-blue-500 bg-blue-200 px-3 py-2 text-sm font-semibold capitalize text-blue-600 shadow-sm"
 								>
 									add category
 								</button>
 							</div>
 						</form>
 					</div>
-					<div className="w-full p-4 text-gray-500">
-						<div className="columns-2 gap-4 space-y-4 lg:columns-3 xl:columns-4 2xl:columns-5">
-							{allNotes.map((note, index) => {
-								// Find the category for this note
-								const category = Object.keys(data).find((cat) =>
-									data[cat].some((n) => n.id === note.id),
-								);
+					<div
+						className={`w-full p-4 text-gray-500 ${allNotes.length > 0 ? "h-max" : "h-full"}`}
+					>
+						{data && Object.keys(data).length === 0 ? (
+							<div className="flex h-full w-full flex-col items-center justify-center gap-2">
+								<img
+									src="/img/not_found_note.png"
+									alt="Notes not created"
+									className="w-full max-w-[150px]"
+								/>
+								<p className="text-center text-base md:text-xl">
+									Start adding your categories{" "}
+								</p>
+							</div>
+						) : allNotes.length === 0 && search !== "" ? (
+							<div className="flex h-full w-full flex-col items-center justify-center gap-2">
+								<img
+									src="/img/not_found_note.png"
+									alt="No search results"
+									className="w-full max-w-[150px]"
+								/>
+								<p className="text-center text-base md:text-xl break-all">
+									No notes found for &quot;{search}&quot;
+								</p>
+							</div>
+						) : allNotes.length > 0 ? (
+							<div className="columns-2 gap-4 space-y-4 lg:columns-3 xl:columns-4 2xl:columns-5">
+								{allNotes.map((note, index) => {
+									const category = Object.keys(data).find((cat) =>
+										data[cat].some((n) => n.id === note.id),
+									);
 
-								return (
-									<Card
-										key={index}
-										note={note}
-										onClick={() => handleEditNote(note, category)}
-									/>
-								);
-							})}
-
-							{allNotes.length === 0 && (
-								<div className="px-1 text-gray-500">No notes found</div>
-							)}
-						</div>
+									return (
+										<div key={index} className="break-inside-avoid">
+											<Card
+												note={note}
+												onClick={() => handleEditNote(note, category)}
+											/>
+										</div>
+									);
+								})}
+							</div>
+						) : (
+							<div className="flex h-full w-full flex-col items-center justify-center gap-2">
+								<p className="text-center text-base md:text-xl">
+									Start adding your first notes
+								</p>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

@@ -46,6 +46,17 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 	};
 
 	useEffect(() => {
+		// Sesuaikan tinggi textarea saat editingNote berubah
+		if (editingNote && modalRef.current) {
+			const textarea = modalRef.current.querySelector("textarea");
+			if (textarea) {
+				textarea.style.height = "auto";
+				textarea.style.height = `${textarea.scrollHeight}px`;
+			}
+		}
+	}, [editingNote, bodyInput]);
+
+	useEffect(() => {
 		// Populate fields when editing an existing note
 		if (editingNote) {
 			setTitleInput(editingNote.title);
@@ -143,10 +154,29 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 		}
 	};
 
+	const handleDeleteNotes = () => {
+		if (
+			(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
+			categorySelect !== ""
+		) {
+			const updatedNotes = { ...data };
+
+			updatedNotes[categorySelect] = updatedNotes[categorySelect].filter(
+				(note) => note.id !== editingNote.id,
+			);
+
+			dispatch({ type: "UPDATE_NOTE", payload: updatedNotes });
+
+			dispatch({ type: "TOGGLE_BOX" });
+
+			showToast("Note deleted successfully.", "success");
+		}
+	};
+
 	return (
 		<div
 			ref={modalRef}
-			className={`absolute right-0 top-0 h-screen w-0 ${modal && "w-screen md:w-[50vw]"} no-scrollbar z-40 overflow-auto whitespace-nowrap bg-white font-sfmono shadow-sm transition-all duration-[.5s]`}
+			className={`absolute right-0 top-0 h-screen w-0 ${modal && "w-screen md:w-[50vw]"} no-scrollbar z-40 overflow-auto whitespace-nowrap border-l border-black/20 bg-white font-sfmono shadow-sm transition-all duration-[.5s]`}
 		>
 			<div className="h-auto min-h-full w-auto w-screen p-5 md:w-[50vw]">
 				<div className="flex h-10 items-center justify-between">
@@ -167,9 +197,34 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 					</button>
 					{(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
 						categorySelect !== "" && (
-							<button onClick={handleSaveNotes} className="capitalize">
-								{editingNote ? "update" : "save"}
-							</button>
+							<div className="flex gap-5">
+								<button
+									onClick={handleDeleteNotes}
+									className="relative h-6 capitalize text-red-500"
+								>
+									{editingNote && (
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-full w-full"
+											viewBox="0 0 48 48"
+										>
+											<path
+												fill="none"
+												stroke="currentColor"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M31.945 7.624L28.84 4.5h-9.68l-3.105 3.124H8.872v4.647h30.256V7.624h-7.183zm-19.901 4.647h23.95v28.124A3.106 3.106 0 0 1 32.89 43.5H15.15a3.106 3.106 0 0 1-3.105-3.105V12.271h0ZM24 17.886v20m6-20v20m-12-20v20"
+											/>
+										</svg>
+									)}
+								</button>
+								<button
+									onClick={handleSaveNotes}
+									className={`capitalize ${editingNote ? "text-blue-500" : "text-green-500"}`}
+								>
+									{editingNote ? "update" : "save"}
+								</button>
+							</div>
 						)}
 				</div>
 				<div className="h-auto w-full">
@@ -188,25 +243,48 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 							autoComplete="false"
 							ref={titleInputRef}
 						/>
-						<div className="flex w-max select-none items-center justify-between gap-4 px-3 pb-4 text-xs font-semibold text-gray-400">
-							<label htmlFor="category">
-								<select
-									name="category"
-									id="category"
-									value={categorySelect || ""}
-									onChange={(e) => setCategorySelect(e.target.value)}
-									className="bg-transparent capitalize outline-none"
-								>
-									<option value="">select category</option>
-									{Object.keys(data).map((item, index) => (
-										<option key={index} value={item}>
-											{item}
-										</option>
-									))}
-								</select>
-							</label>
-							<span>|</span>
-							<p>{characterCount} character</p>
+						<div className="flex w-full select-none flex-col items-start justify-between gap-4 px-3 pb-4 text-[.65rem] font-semibold text-gray-400 lg:flex-row lg:items-center">
+							<div className="flex gap-4">
+								<label htmlFor="category">
+									<select
+										name="category"
+										id="category"
+										value={categorySelect || ""}
+										onChange={(e) => setCategorySelect(e.target.value)}
+										className="bg-transparent capitalize outline-none"
+									>
+										<option value="">select category</option>
+										{Object.keys(data).map((item, index) => (
+											<option key={index} value={item}>
+												{item}
+											</option>
+										))}
+									</select>
+								</label>
+								<span>|</span>
+								<p>{characterCount} character</p>
+							</div>
+							{editingNote && (
+								<div className="flex gap-3">
+									<div className="pl-1 ">
+										{editingNote &&
+											new Date(editingNote.timestamp).toLocaleDateString(
+												"id-ID",
+												{
+													year: "numeric",
+													month: "long",
+													day: "numeric",
+												},
+											)}
+									</div>
+									<div className="">
+										{editingNote &&
+											new Date(editingNote.timestamp)
+												.toLocaleTimeString("id-ID")
+												.replace(/\./g, ":")}
+									</div>
+								</div>
+							)}
 						</div>
 					</label>
 					<label
@@ -219,7 +297,7 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 							onInput={handleTextareaChange}
 							value={bodyInput}
 							onChange={(e) => setBodyInput(e.target.value)}
-							placeholder="typing..."
+							placeholder="type description..."
 							autoComplete="false"
 							className="h-auto resize-none rounded px-4 py-2 outline-none placeholder:capitalize"
 						></textarea>
