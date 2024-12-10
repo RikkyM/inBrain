@@ -166,15 +166,11 @@ const HomePage = () => {
 										const category = Object.keys(data).find((cat) =>
 											data[cat].some((n) => n.id === note.id),
 										);
-
-										console.log("Note being rendered:", { note, category });
-
 										return (
 											<div key={index} className="break-inside-avoid">
 												<Card
 													note={note}
 													onClick={() => {
-														console.log("Card clicked:", { note, category });
 														handleEditNote(note, category);
 													}}
 												/>
