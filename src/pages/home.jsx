@@ -2,8 +2,9 @@ import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import { useCategories } from "../hooks/useCategories";
 import { useToastDispatch } from "../hooks/useToast";
 import Card from "../components/Elements/Card";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import CrudNote from "../components/Layouts/CrudNote";
+import Search from "../components/Elements/Search";
 
 const iconPlus = (
 	<svg
@@ -25,9 +26,6 @@ const HomePage = () => {
 	const [editingNote, setEditingNote] = useState(null);
 	const [editingNoteCategory, setEditingNoteCategory] = useState("");
 	const [search, setSearch] = useState("");
-	const [searchToggle, setSearchToggle] = useState(false);
-	const searchInputRef = useRef(null);
-	const searchRef = useRef(null);
 	const {
 		categoryInput,
 		setCategoryInput,
@@ -48,36 +46,6 @@ const HomePage = () => {
 		dispatchCrudNote({ type: "TOGGLE_BOX" });
 	};
 
-	const handleToggleSearch = () => {
-		if (!searchToggle) {
-			setSearchToggle(true);
-			if (searchInputRef.current) {
-				searchInputRef.current.focus();
-			}
-		} else {
-			setSearchToggle(false);
-		}
-	};
-
-	useEffect(() => {
-		const handleClickOutside = (event) => {
-			if (
-				searchToggle &&
-				searchRef.current &&
-				!searchRef.current.contains(event.target)
-			) {
-				setSearchToggle(false)
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [searchToggle]);
-
-
 	return (
 		<div
 			className={`no-scrollbar h-[calc(100vh-6rem)] w-full overflow-auto font-sfmono transition-all duration-[.5s] md:h-screen`}
@@ -88,7 +56,7 @@ const HomePage = () => {
 					setEditingNoteCategory("");
 					dispatchCrudNote({ type: "TOGGLE_BOX" });
 				}}
-				className="group fixed bottom-5 right-5 z-[15] flex size-14 items-center overflow-hidden rounded-full border border-blue-500 bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
+				className="group fixed bottom-7 right-7 z-[15] flex size-14 items-center overflow-hidden rounded-full border border-blue-500 bg-blue-200 p-2 text-sm text-blue-600 shadow-sm transition-all duration-[.5s] md:hover:w-36"
 			>
 				<div className="ml-3 whitespace-nowrap font-bold capitalize opacity-0 transition-all delay-0 duration-[.25s] md:group-hover:mr-1 md:group-hover:opacity-100 md:group-hover:delay-[.5s] md:group-hover:duration-[.5s]">
 					add note
@@ -101,37 +69,7 @@ const HomePage = () => {
 				<div className="h-full">
 					<div className="flex items-center justify-between px-4 py-1">
 						<h2 className="text-3xl font-bold">Home</h2>
-						<div
-							className={`flex h-10 w-full items-center justify-end gap-3 border border-black bg-white p-2 shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all duration-[.5s] ${searchToggle ? "max-w-[230px] animate-borderIn md:max-w-[300px]" : "max-w-[40px] animate-borderOut cursor-pointer"}`}
-							onClick={searchToggle ? () => {} : handleToggleSearch}
-							ref={searchRef}
-						>
-							<label htmlFor="search" className="w-full">
-								<input
-									type="text"
-									inputMode="search"
-									id="search"
-									ref={searchInputRef}
-									autoComplete="false"
-									value={search}
-									maxLength="30"
-									onChange={(e) => setSearch(e.target.value)}
-									className={`bg-transparent outline-none ${searchToggle ? "w-full" : "w-0"}`}
-								/>
-							</label>
-							<button onClick={handleToggleSearch} className="h-full">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									className="h-full"
-									viewBox="0 0 24 24"
-								>
-									<g fill="none" stroke="currentColor" strokeWidth="2">
-										<circle cx="11" cy="11" r="7" />
-										<path strokeLinecap="round" d="m20 20l-3-3" />
-									</g>
-								</svg>
-							</button>
-						</div>
+						<Search value={search} state={setSearch} />
 					</div>
 					<div className="no-scrollbar select-none items-start justify-start gap-2 overflow-auto p-4">
 						<div className="flex items-center gap-3">

@@ -46,6 +46,7 @@ export default [
           ignoreRestSiblings: true, // Mengabaikan rest siblings dalam destrukturing
         },
       ],
+      // "react/display-name": "off"
     },
   },
 ];
