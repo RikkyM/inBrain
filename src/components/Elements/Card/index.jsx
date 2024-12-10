@@ -1,4 +1,5 @@
 const Card = ({ note, onClick = () => {} }) => {
+	console.log("Card Props:", { note, onClick });
     return (
 			<div onClick={onClick}
 				className="relative select-none cursor-pointer break-inside-avoid-column rounded-lg border border-black bg-white p-3 shadow-[5px_5px_0_0_rgba(0,0,0,1)]"

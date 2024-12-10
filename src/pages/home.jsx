@@ -77,6 +77,7 @@ const HomePage = () => {
 		};
 	}, [searchToggle]);
 
+
 	return (
 		<div
 			className={`no-scrollbar h-[calc(100vh-6rem)] w-full overflow-auto font-sfmono transition-all duration-[.5s] md:h-screen`}
@@ -97,11 +98,11 @@ const HomePage = () => {
 			<div
 				className={`h-full w-full overflow-auto py-5 md:py-10 ${modal ? "pointer-events-none" : "pointer-events-auto"}`}
 			>
-				<div className="flex h-full flex-col">
-					<div className="flex items-center justify-between px-4">
+				<div className="h-full">
+					<div className="flex items-center justify-between px-4 py-1">
 						<h2 className="text-3xl font-bold">Home</h2>
 						<div
-							className={`flex h-10 w-full items-center justify-end gap-3 border border-black bg-white p-2 shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all duration-[.5s] ${searchToggle ? "animate-borderIn max-w-[230px] md:max-w-[300px]" : "animate-borderOut max-w-[40px] cursor-pointer"}`}
+							className={`flex h-10 w-full items-center justify-end gap-3 border border-black bg-white p-2 shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all duration-[.5s] ${searchToggle ? "max-w-[230px] animate-borderIn md:max-w-[300px]" : "max-w-[40px] animate-borderOut cursor-pointer"}`}
 							onClick={searchToggle ? () => {} : handleToggleSearch}
 							ref={searchRef}
 						>
@@ -132,7 +133,7 @@ const HomePage = () => {
 							</button>
 						</div>
 					</div>
-					<div className="no-scrollbar flex select-none flex-col items-start justify-start gap-2 overflow-auto p-4">
+					<div className="no-scrollbar select-none items-start justify-start gap-2 overflow-auto p-4">
 						<div className="flex items-center gap-3">
 							<div className="flex items-center justify-center gap-2">
 								<button
@@ -169,7 +170,7 @@ const HomePage = () => {
 						<form
 							onSubmit={handleSubmitCategory}
 							ref={modalCatRef}
-							style={{ height: sizeCategory ? `${sizeCategory + 70}px` : 0 }}
+							style={{ height: sizeCategory ? `${sizeCategory}px` : 0 }}
 							className="w-full overflow-hidden rounded-md transition-all duration-[.5s] md:max-w-[470px]"
 						>
 							<div className="flex h-max w-full items-center justify-center gap-2 p-3">
@@ -207,33 +208,41 @@ const HomePage = () => {
 									Start adding your categories{" "}
 								</p>
 							</div>
-						) : allNotes.length === 0 && search !== "" ? (
+						) : allNotes.filter((note) => !note.archive).length === 0 &&
+						  search !== "" ? (
 							<div className="flex h-full w-full flex-col items-center justify-center gap-2">
 								<img
 									src="/img/not_found_note.png"
 									alt="No search results"
 									className="w-full max-w-[150px]"
 								/>
-								<p className="text-center text-base md:text-xl break-all">
+								<p className="break-all text-center text-base md:text-xl">
 									No notes found for &quot;{search}&quot;
 								</p>
 							</div>
-						) : allNotes.length > 0 ? (
+						) : allNotes.filter((note) => !note.archive).length > 0 ? (
 							<div className="columns-2 gap-4 space-y-4 lg:columns-3 xl:columns-4 2xl:columns-5">
-								{allNotes.map((note, index) => {
-									const category = Object.keys(data).find((cat) =>
-										data[cat].some((n) => n.id === note.id),
-									);
+								{allNotes
+									.filter((note) => !note.archive)
+									.map((note, index) => {
+										const category = Object.keys(data).find((cat) =>
+											data[cat].some((n) => n.id === note.id),
+										);
 
-									return (
-										<div key={index} className="break-inside-avoid">
-											<Card
-												note={note}
-												onClick={() => handleEditNote(note, category)}
-											/>
-										</div>
-									);
-								})}
+										console.log("Note being rendered:", { note, category });
+
+										return (
+											<div key={index} className="break-inside-avoid">
+												<Card
+													note={note}
+													onClick={() => {
+														console.log("Card clicked:", { note, category });
+														handleEditNote(note, category);
+													}}
+												/>
+											</div>
+										);
+									})}
 							</div>
 						) : (
 							<div className="flex h-full w-full flex-col items-center justify-center gap-2">

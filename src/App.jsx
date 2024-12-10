@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/home";
-// import CategoryPage from "./pages/category";
-// import AboutPage from "./pages/about";
+import ArchivePages from "./pages/archive";
 import Sidebar from "./components/Layouts/Sidebar";
 import Navbar from "./components/Layouts/Navbar";
 import Toast from "./components/Elements/Toast";
@@ -16,8 +15,7 @@ function App() {
 					<Navbar />
 					<Routes>
 						<Route path="/" element={<HomePage />}></Route>
-						{/* <Route path="/category" element={<CategoryPage />}></Route>
-						<Route path="/about" element={<AboutPage />}></Route> */}
+						<Route path="/archive" element={<ArchivePages />}></Route>
 					</Routes>
 				</div>
 			</section>

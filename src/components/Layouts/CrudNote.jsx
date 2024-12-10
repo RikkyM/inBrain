@@ -28,9 +28,9 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 					hour: "2-digit",
 					minute: "2-digit",
 					second: "2-digit",
-					hour12: false, // This ensures 24-hour format
+					hour12: false,
 				})
-				.replace(/\./g, ":") // Replace dots with colons if needed
+				.replace(/\./g, ":")
 		);
 	};
 
@@ -46,7 +46,6 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 	};
 
 	useEffect(() => {
-		// Sesuaikan tinggi textarea saat editingNote berubah
 		if (editingNote && modalRef.current) {
 			const textarea = modalRef.current.querySelector("textarea");
 			if (textarea) {
@@ -57,14 +56,12 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 	}, [editingNote, bodyInput]);
 
 	useEffect(() => {
-		// Populate fields when editing an existing note
 		if (editingNote) {
 			setTitleInput(editingNote.title);
 			setBodyInput(editingNote.body);
 			setCategorySelect(editingNoteCategory);
 			setCharacterCount(editingNote.body.replace(/\s/g, "").length);
 		} else {
-			// Reset fields when creating a new note
 			setTitleInput("");
 			setBodyInput("");
 			setCategorySelect("");
@@ -111,21 +108,19 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 			categorySelect !== ""
 		) {
 			if (editingNote) {
-				// Update existing note
 				const updatedNotes = { ...data };
 
-				// Remove note from original category
 				updatedNotes[editingNoteCategory] = updatedNotes[
 					editingNoteCategory
 				].filter((note) => note.id !== editingNote.id);
 
-				// Add updated note to new category
 				updatedNotes[categorySelect] = [
 					...(updatedNotes[categorySelect] || []),
 					{
 						...editingNote,
 						title: titleInput.trim(),
 						body: bodyInput.trim(),
+						archive: false,
 						timestamp: formatDate(),
 					},
 				];
@@ -134,7 +129,6 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 				dispatch({ type: "TOGGLE_BOX" });
 				showToast("Note updated successfully.", "success");
 			} else {
-				// Add new note (existing logic)
 				const newNotes = {
 					...data,
 					[categorySelect]: [
@@ -143,6 +137,7 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 							id: (data[categorySelect] || []).length + 1,
 							title: titleInput.trim(),
 							body: bodyInput.trim(),
+							archive: false,
 							timestamp: formatDate(),
 						},
 					],
@@ -173,6 +168,22 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 		}
 	};
 
+	const handleArchiveNotes = () => {
+		if (editingNote) {
+			const updatedNotes = { ...data };
+
+			// Update the note's archive status to true in its current category
+			updatedNotes[editingNoteCategory] = updatedNotes[editingNoteCategory].map(
+				(note) =>
+					note.id === editingNote.id ? { ...note, archive: true } : note,
+			);
+
+			dispatch({ type: "UPDATE_NOTE", payload: updatedNotes });
+			dispatch({ type: "TOGGLE_BOX" });
+			showToast("Note archived successfully.", "success");
+		}
+	};
+
 	return (
 		<div
 			ref={modalRef}
@@ -180,21 +191,41 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 		>
 			<div className="h-auto min-h-full w-auto w-screen p-5 md:w-[50vw]">
 				<div className="flex h-10 items-center justify-between">
-					<button
-						onClick={() => dispatch({ type: "TOGGLE_BOX" })}
-						className="size-5"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							className="h-full w-full"
-							viewBox="0 0 2048 2048"
+					<div className="flex items-center gap-4">
+						<button
+							onClick={() => dispatch({ type: "TOGGLE_BOX" })}
+							className="size-5"
 						>
-							<path
-								fill="currentColor"
-								d="M2048 1088H250l787 787l-90 90L6 1024L947 83l90 90l-787 787h1798v128z"
-							/>
-						</svg>
-					</button>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-full w-full"
+								viewBox="0 0 2048 2048"
+							>
+								<path
+									fill="currentColor"
+									d="M2048 1088H250l787 787l-90 90L6 1024L947 83l90 90l-787 787h1798v128z"
+								/>
+							</svg>
+						</button>
+						{editingNote && (
+							<button onClick={handleArchiveNotes} className="size-5">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-full w-full"
+									viewBox="0 0 24 24"
+								>
+									<path
+										fill="none"
+										stroke="currentColor"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="1.5"
+										d="M10.5 11.5h3M20 8v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8m17 0V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3h18Z"
+									/>
+								</svg>
+							</button>
+						)}
+					</div>
 					{(titleInput.trim() !== "" || bodyInput.trim() !== "") &&
 						categorySelect !== "" && (
 							<div className="flex gap-5">
@@ -266,7 +297,7 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 							</div>
 							{editingNote && (
 								<div className="flex gap-3">
-									<div className="pl-1 ">
+									<div className="pl-1">
 										{editingNote &&
 											new Date(editingNote.timestamp).toLocaleDateString(
 												"id-ID",
