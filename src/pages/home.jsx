@@ -64,7 +64,7 @@ const HomePage = () => {
 				<div className="absolute right-2 size-10 flex-shrink-0">{iconPlus}</div>
 			</button>
 			<div
-				className={`h-full w-full overflow-auto py-5 md:py-10 ${modal ? "pointer-events-none" : "pointer-events-auto"}`}
+				className={`no-scrollbar h-full w-full overflow-auto py-5 md:py-10 ${modal ? "pointer-events-none" : "pointer-events-auto"}`}
 			>
 				<div className="h-full">
 					<div className="flex items-center justify-between px-4 py-1">
@@ -136,7 +136,7 @@ const HomePage = () => {
 						className={`w-full p-4 text-gray-500 ${allNotes.length > 0 ? "h-max" : "h-full"}`}
 					>
 						{data && Object.keys(data).length === 0 ? (
-							<div className="flex h-full w-full flex-col items-center justify-center gap-2">
+							<div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500">
 								<img
 									src="/img/not_found_note.png"
 									alt="Notes not created"
