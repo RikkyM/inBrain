@@ -171,8 +171,6 @@ const CrudNote = ({ editingNote = null, editingNoteCategory = "" }) => {
 	const handleArchiveNotes = () => {
 		if (editingNote) {
 			const updatedNotes = { ...data };
-
-			// Update the note's archive status to true in its current category
 			updatedNotes[editingNoteCategory] = updatedNotes[editingNoteCategory].map(
 				(note) =>
 					note.id === editingNote.id ? { ...note, archive: true } : note,

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import Search from "../components/Elements/Search";
-import { useCrudNote } from "../hooks/useCrudNote";
+import { useCrudNote, useCrudNoteDispatch } from "../hooks/useCrudNote";
 import Card from "../components/Elements/Card";
+import {  useToastDispatch } from "../hooks/useToast";
 
 const ArchivePages = () => {
 	const [search, setSearch] = useState("");
 	const { data } = useCrudNote();
+	const showToast = useToastDispatch();
+	const dispatch = useCrudNoteDispatch();
 
 	const allNotes = Object.entries(data).flatMap(([category, categoryNotes]) => {
 		return categoryNotes
@@ -19,6 +22,31 @@ const ArchivePages = () => {
 				return { ...note, category };
 			});
 	});
+
+	const handleUnarchiveNotes = () => {
+		const updatedNotes = { ...data };
+
+		const notesByCategory = allNotes.reduce((acc, note) => {
+			if (!acc[note.category]) {
+				acc[note.category] = [];
+			}
+			acc[note.category].push(note);
+			return acc;
+		}, {});
+
+		Object.keys(notesByCategory).forEach((category) => {
+			updatedNotes[category] = updatedNotes[category].map((note) =>
+				notesByCategory[category].some(
+					(archivedNote) => archivedNote.id === note.id,
+				)
+					? { ...note, archive: false }
+					: note,
+			);
+		});
+
+		dispatch({ type: "UPDATE_NOTE", payload: updatedNotes });
+		showToast("Note unarchived successfully.", "success");
+	};
 
 	return (
 		<div
@@ -43,7 +71,7 @@ const ArchivePages = () => {
 							) : (
 								allNotes.map((note, index) => (
 									<div key={`${index}`} className="break-inside-avoid">
-										<Card note={note} />
+										<Card note={note} archive={handleUnarchiveNotes} />
 									</div>
 								))
 							)}
