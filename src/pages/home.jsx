@@ -136,7 +136,7 @@ const HomePage = () => {
 						className={`w-full p-4 text-gray-500 ${allNotes.length > 0 ? "h-max" : "h-full"}`}
 					>
 						{data && Object.keys(data).length === 0 ? (
-							<div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500">
+							<div className="flex h-full w-full flex-col items-center justify-center gap-2">
 								<img
 									src="/img/not_found_note.png"
 									alt="Notes not created"
